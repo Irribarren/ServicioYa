@@ -22,5 +22,7 @@ Route::get('/', function () {
 Route::resource('servicio', ServiciosController::class)->middleware('auth');
 Route::get('servicio/mostrar', [ServiciosController::class, 'mostrar'])->middleware('auth');
 Route::resource('valoraciones', ValoracionesController::class)->middleware('auth');
-Route::resource('Vendedor/mostrar', VendedorController::class)->middleware('auth');
-
+Route::resource('Vendedor/mostrar', VendedorController::class, 'mostrar')->middleware('auth');
+Route::get('detalle/mostrar', [DetalleServicioController::class, 'mostrar'])->middleware('auth');
+Route::get('servicio/crear', [ServiciosController::class, 'crear'])->middleware('auth');
+Route::get('servicio/editar', [ServiciosController::class, 'editar'])->middleware('auth');
