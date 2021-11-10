@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DetalleServicio;
-use App\Models\Servicio;
+use App\Models\servicio;
 use Illuminate\Http\Request;
+use App\Models\todo;
 
-class ServicioController extends Controller
+class servicioController extends Controller
 {
+    const PAGINACION = 5;
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $servicio = new Servicio();
-        $servicios = $servicio::get();
-        return view('servicio.mostrar')
-            ->with('servicios', $servicios)
-            ->with('titulo', 'MOSTRAR SERVICIO');
+        $buscarpor = $request->get('buscarpor');
+      $servicio =  servicio::paginate(5);
+      $servicio=servicio::where('nombre', 'like', '%'.$buscarpor.'%')->paginate($this::PAGINACION);
+      return view('servicio.index', compact('servicio','buscarpor'));
     }
 
     /**
@@ -41,32 +42,44 @@ class ServicioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            "nombre" => "required | alpha | unique:estudiantes,nombres",
-            "apellido" => "required | alpha | max:6"
+            'nombre' => 'required',
+            'Ubicacion' => 'required',
+            'Descripcion' => 'required',
+            'categoria' => 'required',
+            'precio' => 'required',
+
+
+            'imagen' => 'required|image|mimes:jpeg,png,svg|max:1024'
         ]);
 
-        $servicio = new Servicio();
-        $servicio->nombre = $request->nombre;
-        $servicio->tipo_servicio = $request->tipo_servicio;
-        $servicio-> save();
-        return redirect(Route("servicio.index"));
+        $servicio = $request->all();
+
+        if($imagen = $request->file('imagen')) {
+            $rutaGuardarImg = 'imagen/';
+            $imagenServicio = date('YmdHis'). "." . $imagen->getClientOriginalExtension();
+            $imagen->move($rutaGuardarImg, $imagenServicio);
+            $servicio['imagen'] = "$imagenServicio";
+        }
+
+        servicio::create($servicio);
+        return redirect()->route('servicio.index');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Servicio  $servicio
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Servicio $servicio)
+    public function show($id)
     {
-        //
+
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Servicio  $servicio
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -79,28 +92,42 @@ class ServicioController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Servicio  $servicio
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $servicio = Servicio::find($id);
+        $servicio = servicio::find($id);
         $servicio->nombre = $request->nombre;
-        $servicio->tipo_servicio = $request->tipo_servicio;
-        $servicio-> save();
-        return redirect(Route("servicio.index"));
+        $servicio->nombre = $request->Ubicacion;
+        $servicio->nombre = $request->Descripcion;
+        $servicio->nombre = $request->categoria;
+        $servicio->nombre = $request->precio;
+        $prod = $request->all();
+
+        if($imagen = $request->file('imagen')){
+            $rutaGuardarImg = 'imagen/';
+            $imagenServicio = date('YmdHis') . "." . $imagen->getClientOriginalExtension();
+            $imagen->move($rutaGuardarImg, $imagenServicio);
+            $prod['imagen'] = "$imagenServicio";
+        }else{
+            unset($prod['imagen']);
+        }
+        $servicio->update($prod);
+        return redirect()->route('servicio.index');
+
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Servicio  $servicio
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(servicio $servicio)
     {
-        $serv = Servicio::find($id);
-        $serv->delete();
-        return redirect(Route("servicio.index"));
+        $servicio->delete();
+        return redirect()->route('servicio.index');
     }
 }

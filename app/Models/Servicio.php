@@ -5,9 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Servicio extends Model
+class servicio extends Model
 {
     use HasFactory;
-    public $timestamps = false;
+    protected $fillable = ['nombre','Ubicacion','Descripcion','categoria','precio','imagen'];
 }
-

@@ -1,10 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use  App\Http\Controllers\ServiciosController;
-use  App\Http\Controllers\ValoracionesController;
-use  App\Http\Controllers\VendedorController;
-
+use App\Http\Controllers\servicioController;
+use App\Http\Controllers\TodoController;
+use App\Http\Controllers\DisponiblesController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,10 +18,23 @@ use  App\Http\Controllers\VendedorController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('servicio', ServiciosController::class)->middleware('auth');
-Route::get('servicio/mostrar', [ServiciosController::class, 'mostrar'])->middleware('auth');
-Route::resource('valoraciones', ValoracionesController::class)->middleware('auth');
-Route::resource('Vendedor/mostrar', VendedorController::class, 'mostrar')->middleware('auth');
-Route::get('detalle/mostrar', [DetalleServicioController::class, 'mostrar'])->middleware('auth');
-Route::get('servicio/crear', [ServiciosController::class, 'crear'])->middleware('auth');
-Route::get('servicio/editar', [ServiciosController::class, 'editar'])->middleware('auth');
+
+Route::middleware(['auth:sanctum', 'verified'])->group(function(){
+    Route::resource('/servicio', servicioController::class);
+    Route::get('/dashboard', function(){
+        return view('dashboard');
+    })->name('dashboard');
+});
+Route::middleware(['auth:sanctum', 'verified'])->group(function(){
+    Route::resource('/todo', TodoController::class);
+    Route::get('/dashboard', function(){
+        return view('dashboard');
+    })->name('dashboard');
+});
+Route::middleware(['auth:sanctum', 'verified'])->group(function(){
+    Route::resource('/disponible', DisponiblesController::class);
+    Route::get('/dashboard', function(){
+        return view('dashboard');
+    })->name('dashboard');
+});
+
